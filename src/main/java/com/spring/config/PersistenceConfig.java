@@ -1,17 +1,20 @@
 package com.spring.config;
 
+import com.google.common.base.Preconditions;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.PropertiesFactoryBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.env.Environment;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.jpa.JpaTransactionManager;
-import org.springframework.orm.jpa.JpaVendorAdapter;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
-import org.springframework.orm.jpa.vendor.Database;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
+import javax.sql.DataSource;
 import java.io.IOException;
 import java.util.Properties;
 
@@ -19,34 +22,38 @@ import java.util.Properties;
  * Created by Stanislav Markov mailto: stasmarkov88@gmail.com
  */
 @Configuration
+@EnableTransactionManagement
+@PropertySource({"classpath:db-mysql.properties"})
 public class PersistenceConfig {
+
+    @Autowired
+    Environment environment;
 
     @Bean
     public LocalContainerEntityManagerFactoryBean entityManagerFactory() throws IOException {
         LocalContainerEntityManagerFactoryBean factoryBean = new LocalContainerEntityManagerFactoryBean();
         factoryBean.setDataSource(dataSource());
-        factoryBean.setJpaVendorAdapter(jpaVendorAdapter());
         factoryBean.setPackagesToScan("com.spring.domain");
-        factoryBean.setJpaProperties(getHibernateAdditionalProperties());
+        factoryBean.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
+        factoryBean.setJpaProperties(getHibernateProperties());
         return factoryBean;
     }
 
-    private Properties getHibernateAdditionalProperties() throws IOException {
-        PropertiesFactoryBean hibernateProperties = new PropertiesFactoryBean();
-        hibernateProperties.setProperties(getAdditionalProperties());
-        hibernateProperties.afterPropertiesSet();
-        return hibernateProperties.getObject();
-    }
-
-    private Properties getAdditionalProperties() {
-        Properties properties = new Properties();
-        properties.setProperty("hibernate.hbm2ddl.auto", "create");
-        return properties;
+    protected Properties getHibernateProperties() throws IOException {
+        PropertiesFactoryBean pfb = new PropertiesFactoryBean();
+        pfb.setLocation(new ClassPathResource("hibernate.properties"));
+        pfb.afterPropertiesSet();
+        return pfb.getObject();
     }
 
     @Bean
-    public EmbeddedDatabase dataSource(){
-        return new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2).build();
+    public DataSource dataSource() {
+        final DriverManagerDataSource dataSource = new DriverManagerDataSource();
+        dataSource.setDriverClassName(Preconditions.checkNotNull(environment.getProperty("jdbc.driverClassName")));
+        dataSource.setUrl(Preconditions.checkNotNull(environment.getProperty("jdbc.url")));
+        dataSource.setUsername(Preconditions.checkNotNull(environment.getProperty("jdbc.user")));
+        dataSource.setPassword(Preconditions.checkNotNull(environment.getProperty("jdbc.pass")));
+        return dataSource;
     }
 
     @Bean
@@ -54,15 +61,5 @@ public class PersistenceConfig {
         JpaTransactionManager transactionManager = new JpaTransactionManager();
         transactionManager.setEntityManagerFactory(entityManagerFactory().getObject());
         return transactionManager;
-    }
-
-    @Bean
-    public JpaVendorAdapter jpaVendorAdapter(){
-        HibernateJpaVendorAdapter adapter = new HibernateJpaVendorAdapter();
-        adapter.setShowSql(true);
-        adapter.setDatabase(Database.H2);
-        adapter.setGenerateDdl(true);
-        adapter.setDatabasePlatform("org.hibernate.dialect.H2Dialect");
-        return adapter;
     }
 }

@@ -13,9 +13,9 @@
                        value="/WEB-INF/layout/footer.jsp" />
     </definition>
 
-    <definition name="home" extends="base">
+    <definition name="login" extends="base">
         <put-attribute name="body"
-                       value="/WEB-INF/views/homePage.jsp" />
+                       value="/WEB-INF/views/login.jsp" />
     </definition>
 
     <definition name="registerForm" extends="base">
@@ -26,6 +26,11 @@
     <definition name="user" extends="base">
         <put-attribute name="body"
                        value="/WEB-INF/views/user.jsp" />
+    </definition>
+
+    <definition name="403" extends="base">
+        <put-attribute name="body"
+                       value="/WEB-INF/views/403.jsp" />
     </definition>
 
 </tiles-definitions>

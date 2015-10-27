@@ -10,11 +10,11 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.standal
 /**
  * Created by Stanislav Markov mailto: stasmarkov88@gmail.com
  */
-public class HomeControllerTest {
+public class LoginControllerTest {
 
     @Test
     public void testHome() throws Exception {
-        HomeController controller = new HomeController();
+        LoginController controller = new LoginController();
         MockMvc mockMvc = standaloneSetup(controller).build();
         mockMvc.perform(get("/")).andExpect(view().name("homePage"));
     }

@@ -21,13 +21,17 @@ public class UserServiceImplTest {
 
     @Test
     public void testSave() throws Exception {
+        User user = getUser();
+        User saved = userService.save(user);
+        System.out.println(saved);
+    }
+
+    private User getUser() {
         User user = new User();
+        user.setLogin("login");
         user.setPassword("password");
         user.setAge(25);
         user.setEmail("a@i.ua");
-        user.setLogin("login");
-
-        User saved = userService.save(user);
-        System.out.println(saved.getId());
+        return user;
     }
 }

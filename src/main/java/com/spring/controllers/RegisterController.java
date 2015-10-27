@@ -1,7 +1,7 @@
 package com.spring.controllers;
 
 import com.spring.domain.User;
-import com.spring.repository.UserRepository;
+import com.spring.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,7 +19,7 @@ import javax.validation.Valid;
 @RequestMapping(value = "/register")
 public class RegisterController {
 
-    private UserRepository userRepository;
+    private UserService userService;
 
     @RequestMapping(method = RequestMethod.GET)
     public String showRegister(Model model) {
@@ -32,14 +32,14 @@ public class RegisterController {
         if (bindingResult.hasErrors()) {
             return "registerForm";
         }
-        userRepository.save(user);
-        model.addAttribute("login", user.getLogin());
-        model.addFlashAttribute("user", user);
-        return "redirect:/user/{login}";
+        userService.save(user);
+//        model.addAttribute("login", user.getLogin());
+//        model.addFlashAttribute("user", user);
+        return "redirect:/login";
     }
 
     @Autowired
-    public void setUserRepository(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public void setUserService(UserService userService) {
+        this.userService = userService;
     }
 }

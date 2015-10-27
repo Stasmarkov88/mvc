@@ -11,6 +11,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @Configuration
 @EnableJpaRepositories(basePackages = "com.spring.repository")
 @ComponentScan(basePackages = "com.spring.services")
-@Import(PersistenceConfig.class)
+@Import({PersistenceConfig.class, SecurityConfig.class})
 public class RootConfig {
 }

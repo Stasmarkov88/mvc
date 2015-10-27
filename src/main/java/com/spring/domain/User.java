@@ -1,11 +1,12 @@
 package com.spring.domain;
 
-import org.springframework.data.jpa.domain.AbstractPersistable;
+import org.springframework.data.domain.Persistable;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.*;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -13,28 +14,55 @@ import java.util.Objects;
  */
 @Entity
 @Table(name = "User")
-public class User extends AbstractPersistable<Long> {
+public class User implements Persistable<Long>, Serializable{
+
+    @Id
+    @GeneratedValue
+    private Long id;
 
     @NotNull(message = "пожалуйста, заполните это поле")
-//    @Pattern(regexp = "\\d{1,2}", message = "пожалуйста, введите число")
     @Min(value = 16, message = "возраст должен быть старше 16")
     @Max(value = 100, message = "вам действительно больше 100 лет?)))")
     @Column(name = "age")
     private Integer age;
 
     @Size(min = 2, max = 30, message = "логин должен содержать {min} - {max} символов")
-    @Column(name = "login")
+    @Column(name = "login", unique = true)
     private String login;
 
-    @Size(min = 8, max = 30, message = "пароль должен содержать {min} - {max} символов")
+    @Size(min = 8, message = "пароль должен содержать минимум {min} символов")
     @Column(name = "password")
     private String password;
 
     @Pattern(regexp = "[a-zA-Z-\\d_$\\+\\.]+@[a-z]+\\.[a-z]+", message = "некорректнаый email. Пример:email@gmail.com")
-    @Column(name = "email")
+    @Column(name = "email", unique = true)
     private String email;
 
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "login", referencedColumnName = "login")
+    private List<UserRole> roles = new ArrayList<>();
+
     public User() {
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public boolean isNew() {
+        return null == getId();
+    }
+
+    public List<UserRole> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<UserRole> roles) {
+        this.roles = roles;
     }
 
     public Integer getAge() {
@@ -84,5 +112,17 @@ public class User extends AbstractPersistable<Long> {
     @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), age, login, password, email);
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", age=" + age +
+                ", login='" + login + '\'' +
+                ", password='" + password + '\'' +
+                ", email='" + email + '\'' +
+                ", roles=" + roles +
+                '}';
     }
 }

@@ -15,18 +15,8 @@ import org.springframework.web.servlet.view.tiles3.TilesViewResolver;
  */
 @Configuration
 @EnableWebMvc
-@ComponentScan("com.spring.controllers")
+@ComponentScan(basePackages = {"com.spring.controllers", "com.spring.handlers"})
 public class WebConfig extends WebMvcConfigurerAdapter {
-
-//    @Bean
-//    public ViewResolver viewResolver(){
-//        InternalResourceViewResolver resolver = new InternalResourceViewResolver();
-//        resolver.setPrefix("/WEB-INF/views/");
-//        resolver.setSuffix(".jsp");
-//        resolver.setExposeContextBeansAsAttributes(true);
-//        resolver.setContentType("text/html; charset=UTF-8");
-//        return resolver;
-//    }
 
     @Bean
     public TilesConfigurer tilesConfigurer() {
